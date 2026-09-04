@@ -108,13 +108,12 @@ def load_data ():
     x_test_scaled = scaler.transform(x_test)
 
     return (
-            x_train_scaled.shape,
-            x_val_scaled.shape,
-            x_test_scaled.shape,
-            y_train.shape,
-            y_val.shape,
-            RUL.shape,
+            x_train_scaled,
+            x_val_scaled,
+            x_test_scaled,
+            y_train,
+            y_val,
+            RUL,
             scaler
         )
 
-print(load_data())
