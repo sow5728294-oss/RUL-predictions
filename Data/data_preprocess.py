@@ -60,4 +60,12 @@ train_data['max_cycle'] = train_data.groupby('unit')['cycle'].transform('max')
 #add column containing RUL for that unit
 train_data['RUL'] = train_data['max_cycle'] - train_data['cycle']
 
-print(train_data)
+features = [
+    col for col in train_data.columns if col not in ["unit","RUL","max_cycle"]
+]
+
+#clarify features for training and ground truth
+x = train_data[features]
+y = train_data["RUL"]
+
+
