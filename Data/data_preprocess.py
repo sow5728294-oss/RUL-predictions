@@ -1,6 +1,7 @@
 import numpy as np 
 import pandas as pd 
 
+#assign all columns name
 columns = [
     "unit",
     "cycle",
@@ -30,7 +31,7 @@ columns = [
     "sensor_21"   
 ]
 
-
+#get training data
 train_data = pd.read_csv(
     "target data/train_FD002.txt",
     sep = r"\s+",
@@ -38,6 +39,7 @@ train_data = pd.read_csv(
     names = columns
 )
 
+#get test data
 test_data = pd.read_csv(
     "target data/test_FD002.txt",
     sep = r"\s+",
@@ -45,10 +47,17 @@ test_data = pd.read_csv(
     names = columns
 )
 
+#get ground thruth(RUL) for test data
 RUL = pd.read_csv(
     "target data/RUL_FD002.txt",
     sep = r"\s+",
     header = None,
 )
 
-print(RUL)
+#add column which contain max cycle of that unit
+train_data['max_cycle'] = train_data.groupby('unit')['cycle'].transform('max')
+
+#add column containing RUL for that unit
+train_data['RUL'] = train_data['max_cycle'] - train_data['cycle']
+
+print(train_data)
