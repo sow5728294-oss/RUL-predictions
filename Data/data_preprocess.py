@@ -90,13 +90,9 @@ def load_data ():
     y_train = train_byunit['RUL']
     y_val = val_byunit['RUL']
 
-
-
     #TEST DATA
     
     x_test = test_data[features]
-
-
 
     #SCALING DATA
     scaler = StandardScaler()
