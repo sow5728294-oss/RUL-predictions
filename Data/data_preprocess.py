@@ -1,5 +1,6 @@
 import numpy as np 
 import pandas as pd 
+from sklearn.preprocessing import StandardScaler
 
 #assign all columns name
 columns = [
@@ -67,5 +68,7 @@ features = [
 #clarify features for training and ground truth
 x = train_data[features]
 y = train_data["RUL"]
+
+
 
 
