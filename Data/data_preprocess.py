@@ -1,14 +1,6 @@
 import numpy as np 
 import pandas as pd 
 
-train_data = pd.read_csv(
-    "target data/train_FD002.txt",
-    sep = r"\s+",
-    header = None
-)
-
-print(train_data)
-
 columns = [
     "unit",
     "cycle",
@@ -37,3 +29,26 @@ columns = [
     "sensor_20",
     "sensor_21"   
 ]
+
+
+train_data = pd.read_csv(
+    "target data/train_FD002.txt",
+    sep = r"\s+",
+    header = None,
+    names = columns
+)
+
+test_data = pd.read_csv(
+    "target data/test_FD002.txt",
+    sep = r"\s+",
+    header = None,
+    names = columns
+)
+
+RUL = pd.read_csv(
+    "target data/RUL_FD002.txt",
+    sep = r"\s+",
+    header = None,
+)
+
+print(RUL)
