@@ -1,9 +1,23 @@
 import numpy as np 
 import pandas as pd 
+from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+import joblib
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+processed_dir = BASE_DIR / "Data" / "target data" / "processed"
+processed_dir.mkdir(parents=True, exist_ok=True)
 
 def load_data ():
+
+    train_path = BASE_DIR / "Data" / "target data" / "raw" / "train_FD002.txt"
+    test_path = BASE_DIR / "Data" / "target data" / "raw" / "test_FD002.txt"
+    RUL_path = BASE_DIR / "Data" / "target data" / "raw" / "RUL_FD002.txt"
+
     #assign all columns name
     columns = [
         "unit",
@@ -36,7 +50,7 @@ def load_data ():
 
     #get training data
     train_data = pd.read_csv(
-        "target data/train_FD002.txt",
+       train_path,
         sep = r"\s+",
         header = None,
         names = columns
@@ -44,7 +58,7 @@ def load_data ():
 
     #get test data
     test_data = pd.read_csv(
-        "target data/test_FD002.txt",
+        test_path,
         sep = r"\s+",
         header = None,
         names = columns
@@ -52,7 +66,7 @@ def load_data ():
 
     #get ground thruth(RUL) for test data
     RUL = pd.read_csv(
-        "target data/RUL_FD002.txt",
+        RUL_path,
         sep = r"\s+",
         header = None,
     ).squeeze()
@@ -103,13 +117,68 @@ def load_data ():
 
     x_test_scaled = scaler.transform(x_test)
 
-    return (
-            x_train_scaled,
-            x_val_scaled,
-            x_test_scaled,
-            y_train,
-            y_val,
-            RUL,
-            scaler
-        )
+    # -----------------------------
+    # Create processed DataFrames
+    # -----------------------------
 
+    processed_train = train_byunit[
+        ["unit", "cycle"]
+    ].copy()
+
+    processed_train[features] = x_train_scaled
+
+    processed_train["RUL"] = y_train.values
+
+
+    processed_val = val_byunit[
+        ["unit", "cycle"]
+    ].copy()
+
+    processed_val[features] = x_val_scaled
+
+    processed_val["RUL"] = y_val.values
+
+
+    processed_test = test_data[
+        ["unit", "cycle"]
+    ].copy()
+
+    processed_test[features] = x_test_scaled
+
+    # -----------------------------
+    # Save CSV files
+    # -----------------------------
+
+    processed_train.to_csv(
+        processed_dir / "train_processed.csv",
+        index=False
+    )
+
+    processed_val.to_csv(
+        processed_dir / "val_processed.csv",
+        index=False
+    )
+
+    processed_test.to_csv(
+        processed_dir / "test_processed.csv",
+        index=False
+    )
+
+    # Save scaler for future predictions
+    joblib.dump(
+        scaler,
+        processed_dir / "scaler.pkl"
+    )
+
+    return (
+        processed_train,
+        processed_val,
+        processed_test,
+        RUL,
+        scaler
+    )
+
+
+if __name__ == "__main__":
+    load_data()
+   
