@@ -35,36 +35,36 @@ y_val = val_data["RUL"]
 def test_param():
         #MODEL FOR RANDOM HYPERPARAMETER TO FIND BEST PARAMATERS COMBINATION
         #create the model
-        #model_arch = RandomForestRegressor(
-        #    random_state = 42,
-        #    n_jobs = -1
-        #)
+        model_arch = RandomForestRegressor(
+            random_state = 42,
+            n_jobs = -1
+        )
 
         #craete list of different hyperparameters to test from
-        #param_list = {
-        #    "n_estimators":[100,200,300,400,500,600,700],
-        #    "max_depth":[5,10,15,20,25,30,40,60],
-        #    "min_samples_split":[2,5,10,15,20],
-        #    "min_samples_leaf":[1,2,4,6],
-        #    "max_features":[0.5,0.7,1.0,"sqrt","Log2"]
-        #}
+        param_list = {
+            "n_estimators":[100,200,300,400,500,600,700],
+            "max_depth":[5,10,15,20,25,30,40,60],
+            "min_samples_split":[2,5,10,15,20],
+            "min_samples_leaf":[1,2,4,6],
+            "max_features":[0.5,0.7,1.0,"sqrt","Log2"]
+        }
 
         #create model with randomized hyperparameter search
-        #diff_comb_model = RandomizedSearchCV(
-        #    estimator = model_arch,
-        #    param_distributions = param_list,
-        #    n_iter = 100,
-        #    cv = 5,
-        #    scoring = "neg_mean_absolute_error",
-        #    random_state = 42,
-        #    n_jobs = -1
-        #)
+        diff_comb_model = RandomizedSearchCV(
+            estimator = model_arch,
+            param_distributions = param_list,
+            n_iter = 100,
+            cv = 5,
+            scoring = "neg_mean_absolute_error",
+            random_state = 42,
+            n_jobs = -1
+        )
 
         #train the model
-        #diff_comb_model.fit(x_train,y_train)
+        diff_comb_model.fit(x_train,y_train)
 
-        #print(diff_comb_model.best_params_)
-        pass
+        print(diff_comb_model.best_params_)
+        
 
 #IMPLEMENTATION OF THE BEST HYPERPARAMETERS
 model = RandomForestRegressor(
@@ -72,7 +72,7 @@ model = RandomForestRegressor(
     max_depth = 60,
     min_samples_split = 10,
     min_samples_leaf = 4,
-    max_features = "sqrt",
+    max_features = "log2",
     random_state = 42 
 )
 
@@ -101,5 +101,3 @@ train_r2 = r2_score(y_train,y_train_pred)
 print(f" FOR TRAINING SET \n mae: {train_mae}\nrmse: {train_rmse}\nr2: {train_r2}")
 print(f" FOR VAL SET \n mae: {val_mae}\nrmse: {val_rmse}\nr2: {val_r2}")
 
-print(y_train.describe())
-print(y_val.describe())
