@@ -69,9 +69,9 @@ def test_param():
 #IMPLEMENTATION OF THE BEST HYPERPARAMETERS
 model = RandomForestRegressor(
     n_estimators = 500,
-    max_depth = 60,
-    min_samples_split = 10,
-    min_samples_leaf = 4,
+    max_depth = 30,
+    min_samples_split = 15,
+    min_samples_leaf = 8,
     max_features = "log2",
     random_state = 42 
 )

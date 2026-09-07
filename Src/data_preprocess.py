@@ -48,6 +48,30 @@ def load_data ():
         "sensor_21"   
     ]
 
+    sensor_cols = [
+    "sensor_1",
+    "sensor_2",
+    "sensor_3",
+    "sensor_4",
+    "sensor_5", 
+    "sensor_6",
+    "sensor_7",
+    "sensor_8",
+    "sensor_9",
+    "sensor_10",
+    "sensor_11",
+    "sensor_12",
+    "sensor_13",
+    "sensor_14",
+    "sensor_15",
+    "sensor_16",
+    "sensor_17",
+    "sensor_18",
+    "sensor_19",
+    "sensor_20",
+    "sensor_21"
+    ]
+
     #get training data
     train_data = pd.read_csv(
        train_path,
@@ -60,8 +84,7 @@ def load_data ():
     test_data = pd.read_csv(
         test_path,
         sep = r"\s+",
-        header = None,
-        names = columns
+        header = None,        names = columns
     )
 
     #get ground thruth(RUL) for test data
@@ -70,6 +93,21 @@ def load_data ():
         sep = r"\s+",
         header = None,
     ).squeeze()
+
+    #crete a column for trend of sensor data
+    for col in sensor_cols:
+        for lag in [4,10,20]:
+            train_data[f"{col}_trend_{lag}"] = (
+                train_data.groupby("unit")[col].diff(lag)
+            )
+
+
+
+
+
+
+
+
 
     #add column which contain max cycle of that unit
     train_data['max_cycle'] = train_data.groupby('unit')['cycle'].transform('max')
