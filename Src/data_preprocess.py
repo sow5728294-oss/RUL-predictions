@@ -97,7 +97,7 @@ def load_data ():
 
     #crete a column for trend of sensor data
     for col in sensor_cols:
-        for lag in [4,10,20]:
+        for lag in [2,4,8,10,20]:
             train_data[f"{col}_trend_{lag}"] = (
                 train_data.groupby("unit")[col].diff(lag)
             )
