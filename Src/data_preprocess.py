@@ -84,7 +84,8 @@ def load_data ():
     test_data = pd.read_csv(
         test_path,
         sep = r"\s+",
-        header = None,        names = columns
+        header = None,   
+        names = columns
     )
 
     #get ground thruth(RUL) for test data
@@ -101,12 +102,9 @@ def load_data ():
                 train_data.groupby("unit")[col].diff(lag)
             )
 
-
-
-
-
-
-
+            test_data[f"{col}_trend_{lag}"] = (
+                test_data.groupby("unit")[col].diff(lag)
+            )
 
 
     #add column which contain max cycle of that unit
@@ -208,6 +206,7 @@ def load_data ():
         processed_dir / "scaler.pkl"
     )
 
+    
     return (
         processed_train,
         processed_val,
