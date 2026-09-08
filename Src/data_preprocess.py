@@ -118,7 +118,19 @@ def load_data ():
                 )
             )
 
+            test_data[f"{col}_mean_{window}"] = (
+                grouped.transform(
+                    lambda x: x.rolling(window, min_periods=1).mean()
+                )
+            )
+
             train_data[f"{col}_std_{window}"] = (
+                grouped.transform(
+                    lambda x: x.rolling(window, min_periods=1).std()
+                )
+            )
+
+            test_data[f"{col}_std_{window}"] = (
                 grouped.transform(
                     lambda x: x.rolling(window, min_periods=1).std()
                 )
