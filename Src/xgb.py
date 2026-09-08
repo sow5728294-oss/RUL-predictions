@@ -4,6 +4,7 @@ from pathlib import Path
 from sklearn.metrics import mean_absolute_error, mean_squared_error,r2_score
 from xgboost import XGBRegressor 
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GroupKFold
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,37 +32,46 @@ def test_param():
     )
 
     param_list = {
-        "n_estimators":[100,200,300,400,500,600,700],
+        "n_estimators":[200,400,600,800,1000],
         "learning_rate":[0.01,0.05,0.1,0.2,0.3],
-        "max_depth":[3,4,5,6,7,8,9,10],
+        "max_depth":[3,4,5,6],
         "subsample":[0.5,0.7,1.0],
         "colsample_bytree":[0.5,0.7,1.0],
     }
     
+    cv = GroupKFold(n_splits=5)
+
+
     search_model = RandomizedSearchCV(
         estimator = model_arch,
         param_distributions = param_list,
-        n_iter = 50,
-        cv = 5,
+        n_iter = 30,
+        cv = cv,
         scoring = "neg_mean_absolute_error",
         random_state = 42,
-        n_jobs = -1
+        n_jobs = -1,
+        verbose = 1
     )
 
-    search_model.fit(x_train,y_train)
+    search_model.fit(
+        x_train,
+        y_train,
+        groups = train_data["unit"]
+        )
 
     print(search_model.best_params_)
 
 
 model = XGBRegressor(
-    n_estimators = 500,
+    n_estimators = 800,
     learning_rate = 0.01,
-    max_depth = 9,
+    max_depth =6,
     random_state = 42,
     subsample = 0.7,
     colsample_bytree = 0.7,
 
 )
+
 
 model.fit(x_train,y_train)
 

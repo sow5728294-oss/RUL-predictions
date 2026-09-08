@@ -97,7 +97,7 @@ def load_data ():
 
     #crete a column for trend of sensor data
     for col in sensor_cols:
-        for lag in [2,4,8,10,20]:
+        for lag in[4,10,20]:
             train_data[f"{col}_trend_{lag}"] = (
                 train_data.groupby("unit")[col].diff(lag)
             )
@@ -106,6 +106,23 @@ def load_data ():
                 test_data.groupby("unit")[col].diff(lag)
             )
 
+
+    #create column for rolling mean of sensor data
+    for col in sensor_cols:
+        grouped = train_data.groupby("unit")[col]
+
+        for window in [5, 10, 20]:
+            train_data[f"{col}_mean_{window}"] = (
+                grouped.transform(
+                    lambda x: x.rolling(window, min_periods=1).mean()
+                )
+            )
+
+            train_data[f"{col}_std_{window}"] = (
+                grouped.transform(
+                    lambda x: x.rolling(window, min_periods=1).std()
+                )
+            )
 
     #add column which contain max cycle of that unit
     train_data['max_cycle'] = train_data.groupby('unit')['cycle'].transform('max')
