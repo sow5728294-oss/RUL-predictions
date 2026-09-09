@@ -7,7 +7,7 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GroupKFold
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-xgb.p
+
 processed_dir = BASE_DIR / "Data" / "target data" / "processed"
 
 train_data = pd.read_csv(
@@ -50,7 +50,7 @@ def test_param():
         scoring = "neg_mean_absolute_error",
         random_state = 42,
         n_jobs = -1,
-        verbose = 1
+        verbose = 2
     )
 
     search_model.fit(
@@ -63,9 +63,9 @@ def test_param():
 
 
 model = XGBRegressor(
-    n_estimators = 800,
-    learning_rate = 0.01,
-    max_depth =6,
+    n_estimators = 500, # no need further reduce, already no overfittinh
+    learning_rate = 0.01, #increase wont help
+    max_depth =6, #increase wont help 
     random_state = 42,
     subsample = 0.7,
     colsample_bytree = 0.7,
@@ -90,6 +90,22 @@ val_rmse = np.sqrt(
 
 train_r2 = r2_score(y_train,y_train_pred)
 val_r2 = r2_score(y_val,y_val_pred)
+
+#display amount of error in each RUL range
+result = pd.DataFrame({
+    "actual":y_val,
+    "predicted":y_val_pred
+    })
+
+result["abs_error"] = (result["actual"] - result["predicted"]).abs()
+
+result["RUL_range"] = pd.cut(
+    result["actual"],
+    bins=[-np.inf, 25, 50, 75, 100, 150, 200, np.inf]
+    )
+
+print(result.groupby("RUL_range")["abs_error"].agg(["mean","std","count"])) 
+
 
 print(f"FOR TRAIN DATA: \n MAE: {train_mae} \n RMSE: {train_rmse} \n R2: {train_r2}")
 print(f"FOR VALIDATION DATA: \n MAE: {val_mae} \n RMSE: {val_rmse} \n R2: {val_r2}")
