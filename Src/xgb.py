@@ -38,26 +38,29 @@ def test_param():
     )
 
     param_list = {
-        "n_estimators":[200,400,600,800,1000],
-        "learning_rate":[0.01,0.05,0.1,0.2,0.3],
-        "max_depth":[3,4,5,6],
-        "subsample":[0.5,0.7,1.0],
-        "colsample_bytree":[0.5,0.7,1.0],
+        "n_estimators":[300,500,700,900,1200,1500],
+        "learning_rate":[0.01,0.02,0.03,0.05,0.07,0.1],
+        "max_depth":[3,4,5,6,7,8],
+        "subsample":[0.7,0.8,0.9,1.0],
+        "colsample_bytree":[0.6,0.7,0.8,0.9,1.0],
+        "gamma": [0, 0.1, 0.3, 0.5, 1],
+        "reg_alpha": [0, 0.01, 0.1, 0.5, 1],
+        "reg_lambda": [0.5, 1, 2, 5, 10]
     }
     
     cv = GroupKFold(n_splits=5)
 
 
     search_model = RandomizedSearchCV(
-        estimator = model_arch,
-        param_distributions = param_list,
-        n_iter = 30,
-        cv = cv,
-        scoring = "neg_mean_absolute_error",
-        random_state = 42,
-        n_jobs = -1,
-        verbose = 2
-    )
+    estimator=model_arch,
+    param_distributions=param_list,
+    n_iter=90,
+    scoring="neg_mean_absolute_error",
+    cv=cv,
+    verbose=2,
+    random_state=42,
+    n_jobs=-1
+)
 
     search_model.fit(
         x_train,
@@ -65,17 +68,25 @@ def test_param():
         groups = train_data["unit"]
         )
 
+    print("Best parameters:")
     print(search_model.best_params_)
+
+    print("\nBest CV MAE:")
+    print(-search_model.best_score_)
 
 
 model = XGBRegressor(
-    n_estimators = 500, # no need further reduce, already no overfittinh
+    n_estimators = 900, # no need further reduce, already no overfitting
     learning_rate = 0.01, #increase wont help
-    max_depth =6, #increase wont help 
+    max_depth =8, #increase wont help 
     random_state = 42,
     subsample = 0.7,
-    colsample_bytree = 0.7,
+    colsample_bytree = 0.6,
+    reg_lambda = 2,
+    reg_alpha = 0.1,
+    gamma = 0.5
     )
+
 
 #create log y for train data
 y_train_log = np.log1p(y_train)
@@ -130,3 +141,4 @@ def display_error_by_RUL_range(y_val,y_val_pred):
 
 
 display_error_by_RUL_range(y_val,y_val_pred)
+
