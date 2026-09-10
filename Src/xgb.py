@@ -5,6 +5,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error,r2_score
 from xgboost import XGBRegressor 
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GroupKFold
+import joblib 
 
 #create path to processed data
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,4 +142,7 @@ def display_error_by_RUL_range(y_val,y_val_pred):
 
 
 display_error_by_RUL_range(y_val,y_val_pred)
+
+model_path = BASE_DIR / "Model" / "xgb_model.pkl"
+joblib.dump(model, model_path)
 
