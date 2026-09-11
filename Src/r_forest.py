@@ -4,6 +4,7 @@ from pathlib import Path
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
+import joblib
 
 #set base file location
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,3 +108,6 @@ train_r2 = r2_score(y_train,y_train_pred)
 print(f" FOR TRAINING SET \n mae: {train_mae}\nrmse: {train_rmse}\nr2: {train_r2}")
 print(f" FOR VAL SET \n mae: {val_mae}\nrmse: {val_rmse}\nr2: {val_r2}")
 
+#save the trained model parameters 
+model_path = BASE_DIR / "Model" / "r_forest_model.pkl"
+joblib.dump(model, model_path)

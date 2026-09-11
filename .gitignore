@@ -1,1 +1,4 @@
 Data/target data/processed/*.csv
+Model/r_forest_model.pkl
+venv/
+__pycache__/
