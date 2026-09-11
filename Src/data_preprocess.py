@@ -5,15 +5,17 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import joblib
 
-
+#Path to main project file "RUL"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+#exact path to processed data file
 processed_dir = BASE_DIR / "Data" / "target data" / "processed"
 processed_dir.mkdir(parents=True, exist_ok=True)
 
+
 def load_data ():
 
+    #fetch raw data from target data/raw
     train_path = BASE_DIR / "Data" / "target data" / "raw" / "train_FD002.txt"
     test_path = BASE_DIR / "Data" / "target data" / "raw" / "test_FD002.txt"
     RUL_path = BASE_DIR / "Data" / "target data" / "raw" / "RUL_FD002.txt"
@@ -48,6 +50,7 @@ def load_data ():
         "sensor_21"   
     ]
 
+    #all sensors column
     sensor_cols = [
     "sensor_1",
     "sensor_2",
@@ -95,7 +98,8 @@ def load_data ():
         header = None,
     ).squeeze()
 
-    #crete a column for trend of sensor data
+
+    #create column of (current data value - data of a few cycle before) to spot abnormal data value
     for col in sensor_cols:
         for lag in[4,10,20]:
             train_data[f"{col}_trend_{lag}"] = (
@@ -107,6 +111,7 @@ def load_data ():
             )
 
 
+    #create column of rolling mean to spot sudden increase of sensor value
     for col in sensor_cols:
 
         train_grouped = train_data.groupby("unit")[col]
@@ -133,7 +138,7 @@ def load_data ():
                 )
             )
 
-            # TEST
+           
             test_data[f"{col}_mean_{window}"] = (
                 test_grouped.transform(
                     lambda x: x.rolling(
@@ -159,6 +164,7 @@ def load_data ():
     #add column containing RUL for that unit
     train_data['RUL'] = train_data['max_cycle'] - train_data['cycle']
 
+    #create array for all the columns which will be features for the model
     features = [
         col for col in train_data.columns if col not in ["unit","RUL","max_cycle"]
     ]
@@ -169,7 +175,7 @@ def load_data ():
     #Create array containing only engine units
     units = train_data["unit"].unique()
 
-    #split unit array into train val ratio
+    #split by unit into train val ratio
     train_units, val_units = train_test_split(
         units,
         test_size=0.2,
@@ -187,7 +193,6 @@ def load_data ():
     y_val = val_byunit['RUL']
 
     #TEST DATA
-    
     x_test = test_data[features]
 
     #SCALING DATA
@@ -199,10 +204,8 @@ def load_data ():
 
     x_test_scaled = scaler.transform(x_test)
 
-    # -----------------------------
-    # Create processed DataFrames
-    # -----------------------------
 
+    # Create processed DataFrames
     processed_train = train_byunit[
         ["unit", "cycle"]
     ].copy()
@@ -228,8 +231,7 @@ def load_data ():
     processed_test[features] = x_test_scaled
 
   
-    #Save as CSV files
-    
+    #Save as CSV files   
     processed_train.to_csv(
         processed_dir / "train_processed.csv",
         index=False
@@ -259,7 +261,6 @@ def load_data ():
         RUL,
         scaler
     )
-
 
 if __name__ == "__main__":
     load_data()

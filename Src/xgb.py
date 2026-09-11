@@ -31,6 +31,7 @@ y_val = val_data["RUL"]
 
 
 #function to test best hyperparameter combination
+#only run when needed
 def test_param():
 
     model_arch = XGBRegressor(
@@ -38,6 +39,7 @@ def test_param():
         n_jobs = -1
     )
 
+    #list to choose hyperparameters from
     param_list = {
         "n_estimators":[300,500,700,900,1200,1500],
         "learning_rate":[0.01,0.02,0.03,0.05,0.07,0.1],
@@ -51,7 +53,7 @@ def test_param():
     
     cv = GroupKFold(n_splits=5)
 
-
+    #try 90 different combination of hyperparameter and train them to evaluate the best combination
     search_model = RandomizedSearchCV(
     estimator=model_arch,
     param_distributions=param_list,
@@ -68,14 +70,14 @@ def test_param():
         y_train,
         groups = train_data["unit"]
         )
-
+    #print the best hyperparameters combination with the MAE score
     print("Best parameters:")
     print(search_model.best_params_)
 
     print("\nBest CV MAE:")
     print(-search_model.best_score_)
 
-
+#implementation of the best hyperparameters combination
 model = XGBRegressor(
     n_estimators = 900, # no need further reduce, already no overfitting
     learning_rate = 0.01, #increase wont help
@@ -88,26 +90,18 @@ model = XGBRegressor(
     gamma = 0.5
     )
 
-
-#create log y for train data
-#y_train_log = np.log1p(y_train)
-
-#train the model with x_train and log y train
+#train the model 
 model.fit(x_train,y_train)
 
 #get prediction for x_train and x_val (the output is logged)
 y_train_pred = model.predict(x_train)
 y_val_pred = model.predict(x_val)
 
-#"unlog" the prediction to get original scale of y
-#y_train_pred = np.expm1(y_train_pred_log)
-#y_val_pred = np.expm1(y_val_pred_log)
-
-
 #compare prediction y with actual y and calculate error 
 train_mae = mean_absolute_error(y_train,y_train_pred)
 val_mae = mean_absolute_error(y_val,y_val_pred)
 
+#calculate RMSE of train and validation set
 train_rmse = np.sqrt(
     mean_squared_error(y_train,y_train_pred)
 )
@@ -115,6 +109,7 @@ val_rmse = np.sqrt(
     mean_squared_error(y_val,y_val_pred)
 )
 
+#calculate r2 score for train and validation set
 train_r2 = r2_score(y_train,y_train_pred)
 val_r2 = r2_score(y_val,y_val_pred)
 
@@ -125,6 +120,7 @@ print(f"FOR VALIDATION DATA: \n MAE: {val_mae} \n RMSE: {val_rmse} \n R2: {val_r
 
 
 #display amount of error in each RUL range
+#run when needed
 def display_error_by_RUL_range(y_val,y_val_pred):
     result = pd.DataFrame({
         "actual":y_val,
@@ -140,9 +136,7 @@ def display_error_by_RUL_range(y_val,y_val_pred):
 
     print(result.groupby("RUL_range")["abs_error"].agg(["mean","std","count"])) 
 
-
-display_error_by_RUL_range(y_val,y_val_pred)
-
+#save the trained model parameters 
 model_path = BASE_DIR / "Model" / "xgb_model.pkl"
 joblib.dump(model, model_path)
 

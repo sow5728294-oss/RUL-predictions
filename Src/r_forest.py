@@ -32,6 +32,8 @@ y_train = train_data["RUL"]
 x_val = val_data.drop(columns=["unit", "RUL"])
 y_val = val_data["RUL"]
 
+#MODEL FOR RANDOM HYPERPARAMETER TO FIND BEST PARAMATERS COMBINATION
+#only run when needed
 def test_param():
         #MODEL FOR RANDOM HYPERPARAMETER TO FIND BEST PARAMATERS COMBINATION
         #create the model
@@ -76,6 +78,7 @@ model = RandomForestRegressor(
     random_state = 42 
 )
 
+#train model
 model.fit(x_train,y_train)
 
 
@@ -88,6 +91,7 @@ y_val_pred = model.predict(x_val)
 val_mae = mean_absolute_error(y_val,y_val_pred)
 train_mae = mean_absolute_error(y_train,y_train_pred)
 
+#calculate RMSE
 val_rmse = np.sqrt(
     mean_squared_error(y_val,y_val_pred)
 )
@@ -95,9 +99,11 @@ train_rmse = np.sqrt(
     mean_squared_error(y_train,y_train_pred)
 )
 
+#calculate r2 square
 val_r2 = r2_score(y_val,y_val_pred)
 train_r2 = r2_score(y_train,y_train_pred)
 
+#print result
 print(f" FOR TRAINING SET \n mae: {train_mae}\nrmse: {train_rmse}\nr2: {train_r2}")
 print(f" FOR VAL SET \n mae: {val_mae}\nrmse: {val_rmse}\nr2: {val_r2}")
 
