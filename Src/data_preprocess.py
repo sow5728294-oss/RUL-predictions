@@ -107,34 +107,51 @@ def load_data ():
             )
 
 
-    #create column for rolling mean of sensor data
     for col in sensor_cols:
-        grouped = train_data.groupby("unit")[col]
+
+        train_grouped = train_data.groupby("unit")[col]
+        test_grouped = test_data.groupby("unit")[col]
 
         for window in [5, 10, 20]:
-            train_data[f"{col}_mean_{window}"] = (
-                grouped.transform(
-                    lambda x: x.rolling(window, min_periods=1).mean()
-                )
-            )
 
-            test_data[f"{col}_mean_{window}"] = (
-                grouped.transform(
-                    lambda x: x.rolling(window, min_periods=1).mean()
+            # TRAIN
+            train_data[f"{col}_mean_{window}"] = (
+                train_grouped.transform(
+                    lambda x: x.rolling(
+                        window,
+                        min_periods=1
+                    ).mean()
                 )
             )
 
             train_data[f"{col}_std_{window}"] = (
-                grouped.transform(
-                    lambda x: x.rolling(window, min_periods=1).std()
+                train_grouped.transform(
+                    lambda x: x.rolling(
+                        window,
+                        min_periods=1
+                    ).std()
+                )
+            )
+
+            # TEST
+            test_data[f"{col}_mean_{window}"] = (
+                test_grouped.transform(
+                    lambda x: x.rolling(
+                        window,
+                        min_periods=1
+                    ).mean()
                 )
             )
 
             test_data[f"{col}_std_{window}"] = (
-                grouped.transform(
-                    lambda x: x.rolling(window, min_periods=1).std()
+                test_grouped.transform(
+                    lambda x: x.rolling(
+                        window,
+                        min_periods=1
+                    ).std()
                 )
             )
+
 
     #add column which contain max cycle of that unit
     train_data['max_cycle'] = train_data.groupby('unit')['cycle'].transform('max')
@@ -210,10 +227,9 @@ def load_data ():
 
     processed_test[features] = x_test_scaled
 
-    # -----------------------------
-    # Save CSV files
-    # -----------------------------
-
+  
+    #Save as CSV files
+    
     processed_train.to_csv(
         processed_dir / "train_processed.csv",
         index=False

@@ -90,18 +90,18 @@ model = XGBRegressor(
 
 
 #create log y for train data
-y_train_log = np.log1p(y_train)
+#y_train_log = np.log1p(y_train)
 
 #train the model with x_train and log y train
-model.fit(x_train,y_train_log)
+model.fit(x_train,y_train)
 
 #get prediction for x_train and x_val (the output is logged)
-y_train_pred_log = model.predict(x_train)
-y_val_pred_log = model.predict(x_val)
+y_train_pred = model.predict(x_train)
+y_val_pred = model.predict(x_val)
 
 #"unlog" the prediction to get original scale of y
-y_train_pred = np.expm1(y_train_pred_log)
-y_val_pred = np.expm1(y_val_pred_log)
+#y_train_pred = np.expm1(y_train_pred_log)
+#y_val_pred = np.expm1(y_val_pred_log)
 
 
 #compare prediction y with actual y and calculate error 
